@@ -1,0 +1,39 @@
+{
+  "annotations": {
+    "changelogDate": "20240229210439"
+  },
+  "applications": "*",
+  "entityTableName": "history",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "points",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "trophies",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "registeredAt",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "registeredBy",
+      "fieldType": "String"
+    }
+  ],
+  "name": "History",
+  "relationships": [
+    {
+      "otherEntityName": "book",
+      "relationshipName": "book",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

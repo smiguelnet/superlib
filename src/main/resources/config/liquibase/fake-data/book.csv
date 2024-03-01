@@ -1,0 +1,30 @@
+id;title;pages;author;year;category_id
+1;Java Programming 101;300;John Doe;2022;1
+2;Effective Java;400;Joshua Bloch;2021;1
+3;Head First Design Patterns;600;Eric Freeman;2020;1
+4;Clean Code;350;Robert C. Martin;2019;1
+5;Java Concurrency in Practice;450;Brian Goetz;2018;1
+6;SQL Performance Explained;300;Markus Winand;2022;2
+7;NoSQL Distilled;250;Martin Fowler;2023;2
+8;Database Systems: The Complete Book;500;Hector Garcia-Molina;2021;2
+9;Learning MongoDB;350;Ahmed Yasin;2022;2
+10;Redis in Action;400;Josiah L. Carlson;2020;2
+11;HTML and CSS: Design and Build Websites;300;Jon Duckett;2021;3
+12;JavaScript: The Good Parts;250;Douglas Crockford;2022;3
+13;React Up and Running;400;Stoyan Stefanov;2019;3
+14;Vue.js: Up and Running;350;Callum Macrae;2023;3
+15;Angular Development with Typescript;500;Yakov Fain;2020;3
+16;Cybersecurity Essentials;350;Charles J. Brooks;2021;4
+17;Network Forensics: Tracking Hackers through Cyberspace;450;Jonathan Ham;2020;4
+18;Hacking: The Art of Exploitation;600;Jon Erickson;2019;4
+19;Certified Information Systems Security Professional (CISSP);500;Mike Chapple;2022;4
+20;Cybersecurity for Dummies;300;Joseph Steinberg;2023;4
+21;Artificial Intelligence: A Modern Approach;800;Stuart Russell;2018;5
+22;Machine Learning Yearning;350;Andrew Ng;2020;5
+23;Deep Learning;450;Ian Goodfellow;2019;5
+24;Natural Language Processing in Action;400;Lane, Howard, and Hapke;2021;5
+25;Python Machine Learning;500;Sebastian Raschka;2022;5
+26;Python Crash Course;500;Eric Matthes;2021;1
+27;Designing Data-Intensive Applications;600;Martin Kleppmann;2018;1
+28;Effective Python: 90 Specific Ways to Write Better Python;400;Brett Slatkin;2019;1
+29;The Pragmatic Programmer: Your Journey to Mastery;350;David Thomas and Andrew Hunt;2020;1

@@ -21,6 +21,7 @@ npm-debug.log.*
 .metadata
 tmp/
 tmp/**/*
+temp/**/*
 *.tmp
 *.bak
 *.swp
@@ -115,6 +116,7 @@ Desktop.ini
 ######################
 /bin/
 /deploy/
+temp/
 
 ######################
 # Logs

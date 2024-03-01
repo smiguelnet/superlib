@@ -1,0 +1,20 @@
+{
+  "annotations": {
+    "changelogDate": "20240229210339"
+  },
+  "applications": "*",
+  "entityTableName": "category",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "title",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Category",
+  "relationships": [],
+  "searchEngine": "no"
+}

@@ -1,0 +1,26 @@
+
+entity Book {
+	title String
+	pages Integer
+	author String
+    year Integer
+}
+
+entity Category {
+	id Integer
+	title String
+}
+
+entity History {
+	id Long
+    points Long
+    trophies Integer
+	registeredAt Long
+    registeredBy String
+}
+
+relationship ManyToOne {
+	Book{category} to Category
+    History{book} to Book
+}
+

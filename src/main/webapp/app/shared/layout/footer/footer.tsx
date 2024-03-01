@@ -6,9 +6,9 @@ import { Col, Row } from 'reactstrap';
 
 const Footer = () => (
   <div className="footer page-content">
-    <Row>
+    <Row className={'bg-secondary p-5'}>
       <Col md="12">
-        <p>This is your footer</p>
+        <p>Rodapé</p>
       </Col>
     </Row>
   </div>
