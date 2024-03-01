@@ -23,6 +23,12 @@ export const getEntities = createAsyncThunk('history/fetch_entity_list', async (
   return axios.get<IHistory[]>(requestUrl);
 });
 
+export const getEntitiesByUser = createAsyncThunk('history/fetch_entity_list', async () => {
+  const requestUrl = `${apiUrl}/user`;
+  console.log('request', requestUrl);
+  return axios.get<IHistory[]>(requestUrl);
+});
+
 export const getEntity = createAsyncThunk(
   'history/fetch_entity',
   async (id: string | number) => {
@@ -46,7 +52,7 @@ export const setBookAsRead = createAsyncThunk(
   'history/read',
   async (entity: any, thunkAPI) => {
     const result = await axios.post<any>(`${apiUrl}/read`, entity);
-    thunkAPI.dispatch(getEntities({}));
+    thunkAPI.dispatch(getEntitiesByUser());
     return result;
   },
   { serializeError: serializeAxiosError },

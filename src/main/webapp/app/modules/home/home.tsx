@@ -8,7 +8,7 @@ import { Alert, Button, Col, Row, Table } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities as getBooks } from 'app/entities/book/book.reducer';
 import { getEntities as getCategories } from 'app/entities/category/category.reducer';
-import { getEntities as getUserEvents, setBookAsRead } from 'app/entities/history/history.reducer';
+import { getEntitiesByUser as getUserEvents, setBookAsRead } from 'app/entities/history/history.reducer';
 import { overrideSortStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { getSortState, ValidatedField } from 'react-jhipster';
 import { IBook } from 'app/shared/model/book.model';
@@ -20,10 +20,12 @@ interface BooksListProps {
   books?: IBook[];
   categories?: ICategory[];
   usersHistory?: IHistory[];
-  onReadBook?: (book: IBook) => void;
+  onReadBook?: (book: IBook, read: boolean) => void;
 }
 
 const BooksList: React.FC<BooksListProps> = ({ books, categories, usersHistory, onReadBook }) => {
+  const verifyBook = (bookId: number): boolean => !!usersHistory?.find(e => e?.book?.id === bookId);
+
   return !!books?.length ? (
     <>
       <Row>
@@ -69,20 +71,23 @@ const BooksList: React.FC<BooksListProps> = ({ books, categories, usersHistory, 
               </tr>
             </thead>
             <tbody>
-              {books.map((book: IBook, i: number) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>{book.title}</td>
-                  <td>{book.category?.title}</td>
-                  <td>{book.pages}</td>
-                  <td>{book.author}</td>
-                  <td>{book.year}</td>
-                  <td>
-                    <Button color="success" size="sm" onClick={() => onReadBook(book)}>
-                      <FontAwesomeIcon icon="book" className={'pl2'} /> <span className="d-none d-md-inline"> Eu já li!</span>
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {books.map((book: IBook, i: number) => {
+                const isBookRead = verifyBook(book.id);
+                return (
+                  <tr key={`entity-${i}`} data-cy="entityTable">
+                    <td>{book.title}</td>
+                    <td>{book.category?.title}</td>
+                    <td>{book.pages}</td>
+                    <td>{book.author}</td>
+                    <td>{book.year}</td>
+                    <td>
+                      <Button color={isBookRead ? 'danger' : 'success'} size="sm" onClick={() => onReadBook(book, !isBookRead)}>
+                        <FontAwesomeIcon icon="book" className={'pl2'} /> <span className="d-none d-md-inline"> Eu já li!</span>
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </Table>
         </Col>
@@ -100,7 +105,6 @@ export const Home = () => {
   const navigate = useNavigate();
 
   const account = useAppSelector(state => state.authentication.account);
-
   const loading = useAppSelector(state => state.book.loading);
   const bookList = useAppSelector(state => state.book.entities);
   const categoryList = useAppSelector(state => state.category.entities);
@@ -108,9 +112,9 @@ export const Home = () => {
 
   const [sortState, setSortState] = useState(overrideSortStateWithQueryParams(getSortState(pageLocation, 'id'), pageLocation.search));
 
-  const onReadBook = (book: IBook) => {
+  const onReadBook = (book: IBook, status: boolean = true) => {
     console.log('add event...', book);
-    const entity = { bookId: book.id };
+    const entity = { bookId: book.id, read: status, userId: account.id };
     console.log(entity);
     dispatch(setBookAsRead(entity));
   };
@@ -127,7 +131,8 @@ export const Home = () => {
     );
     // TODO: Revise
     dispatch(getCategories({ sort: `${sortState.sort},${sortState.order}` }));
-    dispatch(getUserEvents({ sort: `${sortState.sort},${sortState.order}` }));
+    console.log('user id', { userId: account.id });
+    dispatch(getUserEvents());
   };
 
   const sortEntities = () => {
@@ -150,7 +155,9 @@ export const Home = () => {
         {account?.login ? (
           <>
             <div>
-              <Alert color="success">Você está logado como: &quot;{account.login}&quot;.</Alert>
+              <Alert color="success">
+                Você está logado como: &quot;{account.login}&quot;. [{account.id}]
+              </Alert>
             </div>
 
             <BooksList books={bookList} categories={categoryList} usersHistory={usersHistory} onReadBook={onReadBook} />

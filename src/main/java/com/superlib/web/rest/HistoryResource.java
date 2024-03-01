@@ -16,12 +16,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,7 +41,7 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/histories")
-@Transactional
+//@Transactional
 public class HistoryResource extends AbstractResource {
 
     private final Logger log = LoggerFactory.getLogger(HistoryResource.class);
@@ -85,15 +87,29 @@ public class HistoryResource extends AbstractResource {
         }
 
         User user = validateLoggedUser("setBookAsRead", "HistoryEvent");
-        History history = new History();
-        history.setBook(byId.get());
-        history.setUser(user);
+        History result = null;
 
-        history.setPoints(100L); // TODO: calculate it
+        if (historyEvent.isRead()) {
+            History history = new History();
+            history.setBook(byId.get());
+            history.setUser(user);
 
-        history.setCreatedDate(Instant.now());
-        history.setCreatedBy(user.getEmail());
-        History result = historyRepository.save(history);
+            history.setPoints(100L); // TODO: calculate it
+
+            history.setCreatedDate(Instant.now());
+            history.setCreatedBy(user.getEmail());
+            result = historyRepository.save(history);
+        } else {
+            List<History> byUserAndBook = historyRepository.findByUserAndBook(user, byId.get());
+            if (!CollectionUtils.isEmpty(byUserAndBook)) {
+                for (History history : byUserAndBook) {
+                    Long id = history.getId();
+                    if (id != null) {
+                        historyRepository.deleteById(id);
+                    }
+                }
+            }
+        }
 
         return ResponseEntity
             .created(new URI("/api/histories/" + result.getId()))
@@ -217,6 +233,7 @@ public class HistoryResource extends AbstractResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of histories in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<History> getAllHistories() {
         log.debug("REST request to get all Histories");
         return historyRepository.findAll();
@@ -229,10 +246,20 @@ public class HistoryResource extends AbstractResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the history, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<History> getHistory(@PathVariable("id") Long id) {
         log.debug("REST request to get History : {}", id);
         Optional<History> history = historyRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(history);
+    }
+
+    @GetMapping("/user")
+    public List<History> getHistoryByUser() {
+        log.debug("REST request to get History");
+
+        User user = validateLoggedUser("setBookAsRead", "HistoryEvent");
+        List<History> history = historyRepository.findAll();
+        return history.stream().filter(e -> e.getUser().getId().equals(user.getId())).collect(Collectors.toList());
     }
 
     /**

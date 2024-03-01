@@ -66,7 +66,7 @@ export const History = () => {
   return (
     <div>
       <h2 id="history-heading" data-cy="HistoryHeading">
-        Histories
+        Histories [{history?.length}]
         <div className="d-flex justify-content-end">
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
@@ -82,18 +82,18 @@ export const History = () => {
                   Id <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
                 </th>
                 <th>Livro</th>
+                <th>Categoria</th>
+                <th>Paginas</th>
                 <th className="hand" onClick={sort('points')}>
                   Points <FontAwesomeIcon icon={getSortIconByFieldName('points')} />
                 </th>
-                <th className="hand" onClick={sort('registeredAt')}>
-                  Registered At <FontAwesomeIcon icon={getSortIconByFieldName('registeredAt')} />
+                <th className="hand" onClick={sort('createdDate')}>
+                  Registered At <FontAwesomeIcon icon={getSortIconByFieldName('createdDate')} />
                 </th>
                 <th className="hand" onClick={sort('registeredBy')}>
                   Registered By <FontAwesomeIcon icon={getSortIconByFieldName('registeredBy')} />
                 </th>
-                <th>
-                  Book <FontAwesomeIcon icon="sort" />
-                </th>
+
                 <th />
               </tr>
             </thead>
@@ -102,28 +102,30 @@ export const History = () => {
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>{history.id}</td>
                   <td>{history.book?.title}</td>
+                  <td>{history.book?.category?.title}</td>
+                  <td>{history.book?.pages}</td>
                   <td>{history.points}</td>
-                  <td>{history.registeredAt}</td>
-                  <td>{history.registeredBy}</td>
-                  <td>{history.book ? <Link to={`/book/${history.book.id}`}>{history.book.id}</Link> : ''}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/history/${history.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
-                      </Button>
-                      <Button tag={Link} to={`/history/${history.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">
-                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
-                      </Button>
-                      <Button
-                        onClick={() => (window.location.href = `/history/${history.id}/delete`)}
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
-                      </Button>
-                    </div>
-                  </td>
+                  <td>{history.createdDate}</td>
+                  <td>{history.createdBy}</td>
+                  {/*<td>{history.book ? <Link to={`/book/${history.book.id}`}>{history.book.id}</Link> : ''}</td>*/}
+                  {/*<td className="text-end">*/}
+                  {/*  <div className="btn-group flex-btn-group-container">*/}
+                  {/*    <Button tag={Link} to={`/history/${history.id}`} color="info" size="sm" data-cy="entityDetailsButton">*/}
+                  {/*      <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>*/}
+                  {/*    </Button>*/}
+                  {/*    <Button tag={Link} to={`/history/${history.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">*/}
+                  {/*      <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>*/}
+                  {/*    </Button>*/}
+                  {/*    <Button*/}
+                  {/*      onClick={() => (window.location.href = `/history/${history.id}/delete`)}*/}
+                  {/*      color="danger"*/}
+                  {/*      size="sm"*/}
+                  {/*      data-cy="entityDeleteButton"*/}
+                  {/*    >*/}
+                  {/*      <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>*/}
+                  {/*    </Button>*/}
+                  {/*  </div>*/}
+                  {/*</td>*/}
                 </tr>
               ))}
             </tbody>
