@@ -8,7 +8,7 @@ import { Alert, Badge, Button, Card, Col, ListGroup, ListGroupItem, Row, Table }
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities as getBooks } from 'app/entities/book/book.reducer';
 import { getEntities as getCategories } from 'app/entities/category/category.reducer';
-import { getEntitiesByUser as getUserEvents, setBookAsRead } from 'app/entities/history/history.reducer';
+import { getEntitiesByUser as getUserEvents, getUsersRanking, setBookAsRead } from 'app/entities/history/history.reducer';
 import { overrideSortStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { getSortState, ValidatedField } from 'react-jhipster';
 import { IBook } from 'app/shared/model/book.model';
@@ -57,11 +57,9 @@ const Dashboard: React.FC<DashboardProps> = ({ books, categories, userHistory })
             <ListGroupItem>
               <label style={{ paddingRight: 4 }}>
                 {e.title}
-                {e.points > 0 && (
-                  <Badge pill color={'warning'} style={{ marginLeft: 6 }}>
-                    Points: {e.points}
-                  </Badge>
-                )}
+                <Badge pill color={e.points > 0 ? 'warning' : 'secondary'} style={{ marginLeft: 6 }}>
+                  Points: {e?.points || 0}
+                </Badge>
                 {!!e?.totalBooks && (
                   <>
                     <label style={{ marginLeft: 10, marginRight: 10 }}>|</label>
@@ -207,6 +205,7 @@ export const Home = () => {
     dispatch(getCategories({ sort: `${sortState.sort},${sortState.order}` }));
     console.log('user id', { userId: account.id });
     dispatch(getUserEvents());
+    dispatch(getUsersRanking());
   };
 
   const sortEntities = () => {
@@ -229,9 +228,16 @@ export const Home = () => {
         {account?.login ? (
           <>
             <p className="lead">Olá {account.login}, selecione os livros que já leu e ganhe pontos.</p>
-            <Card className={'mb-3'}>
-              <Dashboard books={bookList} categories={categoryList} userHistory={userHistory} />
-            </Card>
+            <div style={{ marginBottom: 20 }}>
+              <Row>
+                <Col md={6}>
+                  <Dashboard books={bookList} categories={categoryList} userHistory={userHistory} />
+                </Col>
+                <Col md={6}>
+                  <Dashboard books={bookList} categories={categoryList} userHistory={userHistory} />
+                </Col>
+              </Row>
+            </div>
             <Card>
               <BooksList books={bookList} categories={categoryList} userHistory={userHistory} onReadBook={onReadBook} />
             </Card>

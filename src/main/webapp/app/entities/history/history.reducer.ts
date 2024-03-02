@@ -23,6 +23,11 @@ export const getEntities = createAsyncThunk('history/fetch_entity_list', async (
   return axios.get<IHistory[]>(requestUrl);
 });
 
+export const getUsersRanking = createAsyncThunk('history/fetch_entity_list', async () => {
+  const requestUrl = `${apiUrl}/ranking`;
+  return axios.get<IHistory[]>(requestUrl);
+});
+
 export const getEntitiesByUser = createAsyncThunk('history/fetch_entity_list', async () => {
   const requestUrl = `${apiUrl}/user`;
   console.log('request', requestUrl);

@@ -10,10 +10,12 @@ import com.superlib.security.AuthoritiesConstants;
 import com.superlib.service.GamificationService;
 import com.superlib.service.UserService;
 import com.superlib.service.dto.BookHistoryDTO;
+import com.superlib.service.dto.UserRankingDTO;
 import com.superlib.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -261,6 +263,32 @@ public class HistoryResource extends AbstractResource {
         User user = validateLoggedUser("setBookAsRead", "HistoryEvent");
         List<History> history = historyRepository.findAll();
         return history.stream().filter(e -> e.getUser().getId().equals(user.getId())).collect(Collectors.toList());
+    }
+
+    @GetMapping("/ranking")
+    public List<UserRankingDTO> getUserRanking() {
+        log.debug("REST request users ranking");
+        // TODO: this operation is only to illustrate the dashboard, this should be done in a diff way
+        List<History> history = historyRepository.findAll();
+        List<User> users = userService.getAlLUsers();
+
+        List<UserRankingDTO> usersRanking = new ArrayList<>();
+
+        for (User user : users) {
+            List<History> userEvents = history.stream().filter(e -> e.getUser().getId().equals(user.getId())).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(userEvents)) {
+                // user read something
+                long points = userEvents.stream().mapToLong(e -> e.getPoints()).sum();
+
+                UserRankingDTO userRanking = new UserRankingDTO();
+                userRanking.setUserName(user.getFirstName());
+                userRanking.setEmail(user.getEmail());
+                userRanking.setPoints(points);
+                //                userEvents.stream().collect(Collectors.groupingBy(History::getBook::getCategory));
+            }
+        }
+
+        return usersRanking;
     }
 
     /**
