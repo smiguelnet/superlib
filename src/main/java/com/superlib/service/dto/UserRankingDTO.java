@@ -1,17 +1,26 @@
 package com.superlib.service.dto;
 
-import java.util.Map;
+import java.util.List;
 
 public class UserRankingDTO {
 
+    private Long userId;
     private String userName;
     private String email;
     private Long points;
+    private Integer books;
 
-    private Map<Long, Long> categories;
+    private List<UserCategoryRankingDTO> categories;
 
     // TODO: for demonstration purposes only this KPIs has been calculated on frontend
-    //private Integer trophies;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public String getUserName() {
         return userName;
@@ -37,11 +46,19 @@ public class UserRankingDTO {
         this.points = points;
     }
 
-    public Map<Long, Long> getCategories() {
+    public Integer getBooks() {
+        return books;
+    }
+
+    public void setBooks(Integer books) {
+        this.books = books;
+    }
+
+    public List<UserCategoryRankingDTO> getCategories() {
         return categories;
     }
 
-    public void setCategories(Map<Long, Long> categories) {
+    public void setCategories(List<UserCategoryRankingDTO> categories) {
         this.categories = categories;
     }
 }

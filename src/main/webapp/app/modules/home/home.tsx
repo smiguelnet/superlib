@@ -15,62 +15,74 @@ import { IBook } from 'app/shared/model/book.model';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ICategory } from 'app/shared/model/category.model';
 import { IHistory } from 'app/shared/model/history.model';
+import { IRanking } from 'app/shared/model/ranking.model';
 
-type DashboardProps = {
+type UserDashboardProps = {
+  ranking: IRanking;
+};
+
+type UserRankingProps = {
+  ranking: IRanking[];
+};
+
+type BooksListProps = {
   books?: IBook[];
   categories?: ICategory[];
   userHistory?: IHistory[];
-};
-
-type BooksListProps = DashboardProps & {
   onReadBook?: (book: IBook, read: boolean) => void;
 };
 
-const Dashboard: React.FC<DashboardProps> = ({ books, categories, userHistory }) => {
+const UserDashboard: React.FC<UserDashboardProps> = ({ ranking }) => {
   // TODO: get this var from server configuration
   const TOTAL_BOOKS_TO_ATTRIBUTE_TROPHY = 5;
-
-  const pointsTotal = userHistory?.map(e => e?.points || 0).reduce((a, b) => a + b, 0);
-
-  const pointsPerCategory = categories.map(category => {
-    const categoryUserHistory = userHistory?.filter(history => history.book.category.id === category.id);
-    if (!!categoryUserHistory?.length) {
-      const totalPoints = categoryUserHistory.map(e => e.points).reduce((a, b) => a + b, 0);
-      const totalBooksRead = new Set(categoryUserHistory.map(e => e.book?.id))?.size || 0;
-
-      return { ...category, points: totalPoints, totalBooks: totalBooksRead };
-    }
-    return category;
-  });
+  const pointsTotal = ranking?.points || 0;
 
   return (
     <div>
       <h2 id="dashboard" data-cy="DashboardHeading">
         Dashboard{' '}
         <Badge pill color={pointsTotal > 0 ? 'warning' : 'secondary'}>
-          Total Points: {pointsTotal}
+          Total Points: {pointsTotal} | Books: {ranking?.books}
         </Badge>
       </h2>
-      {!!pointsPerCategory?.length && (
+      {!!ranking?.categories && (
         <ListGroup numbered>
-          {pointsPerCategory.map(e => (
-            <ListGroupItem>
+          {ranking.categories.map((el: any) => (
+            <ListGroupItem key={el.userId}>
               <label style={{ paddingRight: 4 }}>
-                {e.title}
-                <Badge pill color={e.points > 0 ? 'warning' : 'secondary'} style={{ marginLeft: 6 }}>
-                  Points: {e?.points || 0}
+                {el.category.title} | Books: {el.books}
+                <Badge pill color={el.points > 0 ? 'warning' : 'secondary'} style={{ marginLeft: 6 }}>
+                  Points: {el.points || 0}
                 </Badge>
-                {!!e?.totalBooks && (
-                  <>
-                    <label style={{ marginLeft: 10, marginRight: 10 }}>|</label>
-                    <label> Livros: {e.totalBooks}</label>
-                  </>
-                )}
-                {e.totalBooks >= TOTAL_BOOKS_TO_ATTRIBUTE_TROPHY && (
+                {(el?.books || 0) >= TOTAL_BOOKS_TO_ATTRIBUTE_TROPHY && (
                   <Badge pill color={'success'} style={{ marginLeft: 6 }}>
                     <FontAwesomeIcon icon={'trophy'} />
                   </Badge>
                 )}
+              </label>
+            </ListGroupItem>
+          ))}
+        </ListGroup>
+      )}
+    </div>
+  );
+};
+
+const UsersRanking: React.FC<UserRankingProps> = ({ ranking }) => {
+  return (
+    <div>
+      <h2 id="dashboard" data-cy="DashboardHeading">
+        Users Ranking
+      </h2>
+      {!!ranking?.length && (
+        <ListGroup numbered>
+          {ranking.map((el: any) => (
+            <ListGroupItem key={el.userId}>
+              <label style={{ paddingRight: 4 }}>
+                {el.userId} {el.userName} [{el.email}]
+                <Badge pill color={el.points > 0 ? 'info' : 'secondary'} style={{ marginLeft: 6 }}>
+                  Points: {el.points || 0}
+                </Badge>
               </label>
             </ListGroupItem>
           ))}
@@ -181,6 +193,7 @@ export const Home = () => {
   const bookList = useAppSelector(state => state.book.entities);
   const categoryList = useAppSelector(state => state.category.entities);
   const userHistory = useAppSelector(state => state.history.entities);
+  const ranking = useAppSelector(state => state.history.ranking);
 
   const [sortState, setSortState] = useState(overrideSortStateWithQueryParams(getSortState(pageLocation, 'id'), pageLocation.search));
 
@@ -231,10 +244,10 @@ export const Home = () => {
             <div style={{ marginBottom: 20 }}>
               <Row>
                 <Col md={6}>
-                  <Dashboard books={bookList} categories={categoryList} userHistory={userHistory} />
+                  <UserDashboard ranking={ranking?.find((e: IRanking) => e.userId === account.id)} />
                 </Col>
                 <Col md={6}>
-                  <Dashboard books={bookList} categories={categoryList} userHistory={userHistory} />
+                  <UsersRanking ranking={ranking?.filter((e: IRanking) => e.points > 0).sort((a, b) => b.points - a.points)} />
                 </Col>
               </Row>
             </div>

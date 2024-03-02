@@ -4,12 +4,14 @@ import { ASC } from 'app/shared/util/pagination.constants';
 import { cleanEntity } from 'app/shared/util/entity-utils';
 import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IHistory, defaultValue } from 'app/shared/model/history.model';
+import { IRanking } from 'app/shared/model/ranking.model';
 
 const initialState: EntityState<IHistory> = {
   loading: false,
   errorMessage: null,
   entities: [],
   entity: defaultValue,
+  ranking: [],
   updating: false,
   updateSuccess: false,
 };
@@ -23,9 +25,9 @@ export const getEntities = createAsyncThunk('history/fetch_entity_list', async (
   return axios.get<IHistory[]>(requestUrl);
 });
 
-export const getUsersRanking = createAsyncThunk('history/fetch_entity_list', async () => {
+export const getUsersRanking = createAsyncThunk('history/fetch_ranking', async () => {
   const requestUrl = `${apiUrl}/ranking`;
-  return axios.get<IHistory[]>(requestUrl);
+  return axios.get<IRanking[]>(requestUrl);
 });
 
 export const getEntitiesByUser = createAsyncThunk('history/fetch_entity_list', async () => {
@@ -58,6 +60,7 @@ export const setBookAsRead = createAsyncThunk(
   async (entity: any, thunkAPI) => {
     const result = await axios.post<any>(`${apiUrl}/read`, entity);
     thunkAPI.dispatch(getEntitiesByUser());
+    thunkAPI.dispatch(getUsersRanking());
     return result;
   },
   { serializeError: serializeAxiosError },
@@ -110,6 +113,7 @@ export const HistorySlice = createEntitySlice({
         state.updateSuccess = true;
         state.entity = {};
       })
+
       .addMatcher(isFulfilled(getEntities), (state, action) => {
         const { data } = action.payload;
 
@@ -125,6 +129,9 @@ export const HistorySlice = createEntitySlice({
             return order === ASC ? (a[predicate] < b[predicate] ? -1 : 1) : b[predicate] < a[predicate] ? -1 : 1;
           }),
         };
+      })
+      .addMatcher(isFulfilled(getUsersRanking), (state, action) => {
+        state.ranking = action.payload?.data;
       })
       .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
         state.updating = false;
