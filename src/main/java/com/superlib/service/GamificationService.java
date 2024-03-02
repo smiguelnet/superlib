@@ -31,6 +31,7 @@ public class GamificationService {
         return Math.round(book.getPages() / PAGES_TO_UNLOCK_EXTRA_POINTS) + POINTS_PER_BOOK;
     }
 
+    // TODO: this is for demonstration purposes only
     public static List<UserRankingDTO> getUserRanking(List<History> events, List<User> users) {
         List<UserRankingDTO> usersRanking = new ArrayList<>();
 

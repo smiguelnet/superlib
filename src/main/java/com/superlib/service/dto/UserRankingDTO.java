@@ -12,8 +12,6 @@ public class UserRankingDTO {
 
     private List<UserCategoryRankingDTO> categories;
 
-    // TODO: for demonstration purposes only this KPIs has been calculated on frontend
-
     public Long getUserId() {
         return userId;
     }
