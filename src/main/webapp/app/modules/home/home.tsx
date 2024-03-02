@@ -105,26 +105,26 @@ const BooksList: React.FC<BooksListProps> = ({ books, categories, userHistory, o
             Você já leu {userHistory.length} livro{userHistory.length > 0 ? 's' : ''}.
           </p>
         </Col>
-        <Col className={'col-6'}>
-          <ValidatedField
-            id="book-category"
-            name="book-category"
-            type="select"
-            className="form-control"
-            onChange={event => {
-              console.log(event.target.value);
-            }}
-          >
-            <option value="0" key="0">
-              Todas as Categorias
-            </option>
-            {categories.map(category => (
-              <option value={category.id} key={category.id}>
-                {category.title}
-              </option>
-            ))}
-          </ValidatedField>
-        </Col>
+        {/*<Col className={'col-6'}>*/}
+        {/*  <ValidatedField*/}
+        {/*    id="book-category"*/}
+        {/*    name="book-category"*/}
+        {/*    type="select"*/}
+        {/*    className="form-control"*/}
+        {/*    onChange={event => {*/}
+        {/*      console.log(event.target.value);*/}
+        {/*    }}*/}
+        {/*  >*/}
+        {/*    <option value="0" key="0">*/}
+        {/*      Todas as Categorias*/}
+        {/*    </option>*/}
+        {/*    {categories.map(category => (*/}
+        {/*      <option value={category.id} key={category.id}>*/}
+        {/*        {category.title}*/}
+        {/*      </option>*/}
+        {/*    ))}*/}
+        {/*  </ValidatedField>*/}
+        {/*</Col>*/}
       </Row>
       <hr />
       <Row>
