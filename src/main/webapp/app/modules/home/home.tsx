@@ -3,7 +3,7 @@ import './home.scss';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-import { Alert, Button, Col, Row, Table } from 'reactstrap';
+import { Alert, Badge, Button, Card, Col, ListGroup, ListGroupItem, Row, Table } from 'reactstrap';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities as getBooks } from 'app/entities/book/book.reducer';
@@ -16,23 +16,84 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ICategory } from 'app/shared/model/category.model';
 import { IHistory } from 'app/shared/model/history.model';
 
-interface BooksListProps {
+type DashboardProps = {
   books?: IBook[];
   categories?: ICategory[];
-  usersHistory?: IHistory[];
-  onReadBook?: (book: IBook, read: boolean) => void;
-}
+  userHistory?: IHistory[];
+};
 
-const BooksList: React.FC<BooksListProps> = ({ books, categories, usersHistory, onReadBook }) => {
-  const getBookHistory = (bookId: number): IHistory => usersHistory?.find(e => e?.book?.id === bookId);
+type BooksListProps = DashboardProps & {
+  onReadBook?: (book: IBook, read: boolean) => void;
+};
+
+const Dashboard: React.FC<DashboardProps> = ({ books, categories, userHistory }) => {
+  // TODO: get this var from server configuration
+  const TOTAL_BOOKS_TO_ATTRIBUTE_TROPHY = 5;
+
+  const pointsTotal = userHistory?.map(e => e?.points || 0).reduce((a, b) => a + b, 0);
+
+  const pointsPerCategory = categories.map(category => {
+    const categoryUserHistory = userHistory?.filter(history => history.book.category.id === category.id);
+    if (!!categoryUserHistory?.length) {
+      const totalPoints = categoryUserHistory.map(e => e.points).reduce((a, b) => a + b, 0);
+      const totalBooksRead = new Set(categoryUserHistory.map(e => e.book?.id))?.size || 0;
+
+      return { ...category, points: totalPoints, totalBooks: totalBooksRead };
+    }
+    return category;
+  });
+
+  return (
+    <div>
+      <h2 id="dashboard" data-cy="DashboardHeading">
+        Dashboard{' '}
+        <Badge pill color={pointsTotal > 0 ? 'warning' : 'secondary'}>
+          Total Points: {pointsTotal}
+        </Badge>
+      </h2>
+      {!!pointsPerCategory?.length && (
+        <ListGroup numbered>
+          {pointsPerCategory.map(e => (
+            <ListGroupItem>
+              <label style={{ paddingRight: 4 }}>
+                {e.title}
+                {e.points > 0 && (
+                  <Badge pill color={'warning'} style={{ marginLeft: 6 }}>
+                    Points: {e.points}
+                  </Badge>
+                )}
+                {!!e?.totalBooks && (
+                  <>
+                    <label style={{ marginLeft: 10, marginRight: 10 }}>|</label>
+                    <label> Livros: {e.totalBooks}</label>
+                  </>
+                )}
+                {e.totalBooks >= TOTAL_BOOKS_TO_ATTRIBUTE_TROPHY && (
+                  <Badge pill color={'success'} style={{ marginLeft: 6 }}>
+                    <FontAwesomeIcon icon={'trophy'} />
+                  </Badge>
+                )}
+              </label>
+            </ListGroupItem>
+          ))}
+        </ListGroup>
+      )}
+    </div>
+  );
+};
+
+const BooksList: React.FC<BooksListProps> = ({ books, categories, userHistory, onReadBook }) => {
+  const getBookHistory = (bookId: number): IHistory => userHistory?.find(e => e?.book?.id === bookId);
   return !!books?.length ? (
     <>
       <Row>
         <Col className={'col-6'}>
           <h2 id="book-heading" data-cy="BookHeading">
-            Livros Disponíveis
+            Existem {books.length} Livros Disponíveis
           </h2>
-          <p>Você já leu {usersHistory.length}</p>
+          <p>
+            Você já leu {userHistory.length} livro{userHistory.length > 0 ? 's' : ''}.
+          </p>
         </Col>
         <Col className={'col-6'}>
           <ValidatedField
@@ -121,7 +182,7 @@ export const Home = () => {
   const loading = useAppSelector(state => state.book.loading);
   const bookList = useAppSelector(state => state.book.entities);
   const categoryList = useAppSelector(state => state.category.entities);
-  const usersHistory = useAppSelector(state => state.history.entities);
+  const userHistory = useAppSelector(state => state.history.entities);
 
   const [sortState, setSortState] = useState(overrideSortStateWithQueryParams(getSortState(pageLocation, 'id'), pageLocation.search));
 
@@ -164,16 +225,16 @@ export const Home = () => {
     <Row>
       <Col>
         <h1 className="display-4">Esse eu já li!</h1>
-        <p className="lead">Selecione os livros que já leu e ganhe pontos</p>
+
         {account?.login ? (
           <>
-            <div>
-              <Alert color="success">
-                Você está logado como: &quot;{account.login}&quot;. [{account.id}]
-              </Alert>
-            </div>
-
-            <BooksList books={bookList} categories={categoryList} usersHistory={usersHistory} onReadBook={onReadBook} />
+            <p className="lead">Olá {account.login}, selecione os livros que já leu e ganhe pontos.</p>
+            <Card className={'mb-3'}>
+              <Dashboard books={bookList} categories={categoryList} userHistory={userHistory} />
+            </Card>
+            <Card>
+              <BooksList books={bookList} categories={categoryList} userHistory={userHistory} onReadBook={onReadBook} />
+            </Card>
           </>
         ) : (
           <div>
