@@ -101,9 +101,6 @@ const BooksList: React.FC<BooksListProps> = ({ books, categories, userHistory, o
           <h2 id="book-heading" data-cy="BookHeading">
             Existem {books.length} Livros Disponíveis
           </h2>
-          <p>
-            Você já leu {userHistory.length} livro{userHistory.length > 0 ? 's' : ''}.
-          </p>
         </Col>
         {/*<Col className={'col-6'}>*/}
         {/*  <ValidatedField*/}
@@ -229,16 +226,12 @@ export const Home = () => {
     }
   };
 
-  const handleSyncList = () => {
-    sortEntities();
-  };
-
   return (
     <Row>
       <Col>
-        <h1 className="display-4">Esse eu já li!</h1>
+        <h1 className="display-4">Esse eu já li! {account?.id}</h1>
 
-        {account?.login ? (
+        {!!account?.login ? (
           <>
             <p className="lead">Olá {account.login}, selecione os livros que já leu e ganhe pontos.</p>
             <div style={{ marginBottom: 20 }}>
