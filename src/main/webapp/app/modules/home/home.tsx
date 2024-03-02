@@ -24,8 +24,7 @@ interface BooksListProps {
 }
 
 const BooksList: React.FC<BooksListProps> = ({ books, categories, usersHistory, onReadBook }) => {
-  const verifyBook = (bookId: number): boolean => !!usersHistory?.find(e => e?.book?.id === bookId);
-
+  const getBookHistory = (bookId: number): IHistory => usersHistory?.find(e => e?.book?.id === bookId);
   return !!books?.length ? (
     <>
       <Row>
@@ -72,17 +71,31 @@ const BooksList: React.FC<BooksListProps> = ({ books, categories, usersHistory, 
             </thead>
             <tbody>
               {books.map((book: IBook, i: number) => {
-                const isBookRead = verifyBook(book.id);
+                const bookHistory = getBookHistory(book.id);
+                const isBookRead = !!bookHistory?.id;
                 return (
                   <tr key={`entity-${i}`} data-cy="entityTable">
-                    <td>{book.title}</td>
+                    <td>
+                      {book.title}
+                      {!!bookHistory?.points && (
+                        <div className={'text-success'}>
+                          + {bookHistory.points} point{bookHistory.points > 0 ? 's' : ''}
+                        </div>
+                      )}
+                    </td>
                     <td>{book.category?.title}</td>
                     <td>{book.pages}</td>
                     <td>{book.author}</td>
                     <td>{book.year}</td>
                     <td>
-                      <Button color={isBookRead ? 'danger' : 'success'} size="sm" onClick={() => onReadBook(book, !isBookRead)}>
-                        <FontAwesomeIcon icon="book" className={'pl2'} /> <span className="d-none d-md-inline"> Eu já li!</span>
+                      <Button
+                        color={isBookRead ? 'danger' : 'success'}
+                        size="sm"
+                        style={{ width: 170 }}
+                        onClick={() => onReadBook(book, !isBookRead)}
+                      >
+                        <FontAwesomeIcon icon={isBookRead ? 'trash' : 'book'} className={'pt-2'} style={{ width: 20 }} />{' '}
+                        <span className="d-none d-md-inline">{`${isBookRead ? 'Ops, Desmarcar' : 'Marcar como Lido'}`}</span>
                       </Button>
                     </td>
                   </tr>

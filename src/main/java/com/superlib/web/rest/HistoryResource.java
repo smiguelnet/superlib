@@ -7,6 +7,7 @@ import com.superlib.repository.BookRepository;
 import com.superlib.repository.CategoryRepository;
 import com.superlib.repository.HistoryRepository;
 import com.superlib.security.AuthoritiesConstants;
+import com.superlib.service.GamificationService;
 import com.superlib.service.UserService;
 import com.superlib.service.dto.BookHistoryDTO;
 import com.superlib.web.rest.errors.BadRequestAlertException;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +41,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/histories")
-//@Transactional
 public class HistoryResource extends AbstractResource {
 
     private final Logger log = LoggerFactory.getLogger(HistoryResource.class);
@@ -75,7 +74,7 @@ public class HistoryResource extends AbstractResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/read")
-    public ResponseEntity<History> setBookAsRead(@RequestBody BookHistoryDTO historyEvent) throws URISyntaxException {
+    public ResponseEntity<History> setBookReadStatus(@RequestBody BookHistoryDTO historyEvent) throws URISyntaxException {
         log.debug("REST request to save History : {}", historyEvent);
         if (historyEvent.getBookId() == null) {
             throw new BadRequestAlertException("Livro não informado", ENTITY_NAME, "idnotexists");
@@ -86,35 +85,37 @@ public class HistoryResource extends AbstractResource {
             throw new BadRequestAlertException("Livro não identificado no sistema", ENTITY_NAME, "idnotexists");
         }
 
+        Book book = byId.get();
+
         User user = validateLoggedUser("setBookAsRead", "HistoryEvent");
         History result = null;
 
         if (historyEvent.isRead()) {
+            long points = GamificationService.calculatePoints(book);
+
             History history = new History();
-            history.setBook(byId.get());
+            history.setBook(book);
             history.setUser(user);
-
-            history.setPoints(100L); // TODO: calculate it
-
+            history.setPoints(points);
             history.setCreatedDate(Instant.now());
             history.setCreatedBy(user.getEmail());
             result = historyRepository.save(history);
+
+            return ResponseEntity
+                .created(new URI("/api/histories/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, book.getTitle()))
+                .body(result);
         } else {
+            // in case the same book was evaluated twice or even more (unusual condition)
             List<History> byUserAndBook = historyRepository.findByUserAndBook(user, byId.get());
             if (!CollectionUtils.isEmpty(byUserAndBook)) {
-                for (History history : byUserAndBook) {
-                    Long id = history.getId();
-                    if (id != null) {
-                        historyRepository.deleteById(id);
-                    }
-                }
+                historyRepository.deleteAll(byUserAndBook);
             }
+            return ResponseEntity
+                .noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, book.getTitle()))
+                .build();
         }
-
-        return ResponseEntity
-            .created(new URI("/api/histories/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-            .body(result);
     }
 
     /**
