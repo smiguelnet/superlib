@@ -241,7 +241,7 @@ export const Home = () => {
   return (
     <Row>
       <Col>
-        <h1 className="display-4">Esse eu já li! {account?.id}</h1>
+        <h1 className="display-4">Esse eu já li!</h1>
         {account && account?.login && (
           <>
             <p className="lead">Olá {account.login}, selecione os livros que já leu e ganhe pontos.</p>
