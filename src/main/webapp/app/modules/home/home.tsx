@@ -25,6 +25,7 @@ type UserDashboardProps = {
 
 type UserRankingProps = {
   ranking: IRanking[];
+  account: IUser;
 };
 
 type BooksListProps = {
@@ -69,22 +70,32 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ ranking, account }) => {
   );
 };
 
-const UsersRanking: React.FC<UserRankingProps> = ({ ranking }) => {
+const UsersRanking: React.FC<UserRankingProps> = ({ ranking, account }) => {
   return (
     <div>
       <h2 id="dashboard" data-cy="DashboardHeading">
         Users Ranking
       </h2>
       {!!ranking?.length && (
-        <ListGroup numbered>
-          {ranking.map((el: any) => (
+        <ListGroup>
+          <ListGroupItem active={true}>{ranking?.length} maiores leitores de livros</ListGroupItem>
+          {ranking.map((el: any, index: number) => (
             <ListGroupItem key={el.userId}>
+              <Badge color={'success'} style={{ marginRight: 6 }}>
+                {index + 1}
+              </Badge>
+
               <label style={{ paddingRight: 4 }}>
-                {el.userId} {el.userName} [{el.email}]
+                {el.userName}
                 <Badge pill color={el.points > 0 ? 'info' : 'secondary'} style={{ marginLeft: 6 }}>
                   Points: {el.points || 0}
                 </Badge>
               </label>
+              {account && account.id === el.userId && (
+                <Badge color={'success'} style={{ marginLeft: 6 }}>
+                  {`${index === 0 ? 'Parabéns' : 'Legal! Você faz parte do ranking'}`}
+                </Badge>
+              )}
             </ListGroupItem>
           ))}
         </ListGroup>
@@ -240,7 +251,10 @@ export const Home = () => {
                   <UserDashboard ranking={ranking?.find((e: IRanking) => e.userId === account.id)} account={account} />
                 </Col>
                 <Col md={6}>
-                  <UsersRanking ranking={ranking?.filter((e: IRanking) => e.points > 0).sort((a, b) => b.points - a.points)} />
+                  <UsersRanking
+                    ranking={ranking?.filter((e: IRanking) => e.points > 0).sort((a, b) => b.points - a.points)}
+                    account={account}
+                  />
                 </Col>
               </Row>
             </div>
