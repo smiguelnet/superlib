@@ -16,9 +16,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ICategory } from 'app/shared/model/category.model';
 import { IHistory } from 'app/shared/model/history.model';
 import { IRanking } from 'app/shared/model/ranking.model';
+import { IUser } from 'app/shared/model/user.model';
 
 type UserDashboardProps = {
   ranking: IRanking;
+  account: IUser;
 };
 
 type UserRankingProps = {
@@ -32,25 +34,26 @@ type BooksListProps = {
   onReadBook?: (book: IBook, read: boolean) => void;
 };
 
-const UserDashboard: React.FC<UserDashboardProps> = ({ ranking }) => {
+const UserDashboard: React.FC<UserDashboardProps> = ({ ranking, account }) => {
   const pointsTotal = ranking?.points || 0;
 
   return (
     <div>
       <h2 id="dashboard" data-cy="DashboardHeading">
-        Dashboard{' '}
-        <Badge pill color={pointsTotal > 0 ? 'warning' : 'secondary'}>
-          Total Points: {pointsTotal} | Books: {ranking?.books}
-        </Badge>
+        Meu Dashboard
+        {/*{account.firstName}*/}
       </h2>
       {!!ranking?.categories && (
-        <ListGroup numbered>
+        <ListGroup>
+          <ListGroupItem active={true}>
+            Total de livros lidos: {ranking?.books}. Pontos: {pointsTotal}
+          </ListGroupItem>
           {ranking.categories.map((el: any) => (
             <ListGroupItem key={el.userId}>
               <label style={{ paddingRight: 4 }}>
-                {el.category.title} | Books: {el.books}
+                {el.category.title}. Total de livros: {el.books}
                 <Badge pill color={el.points > 0 ? 'warning' : 'secondary'} style={{ marginLeft: 6 }}>
-                  Points: {el.points || 0}
+                  Pontos: {el.points || 0}
                 </Badge>
                 {!!el?.trophy && (
                   <Badge pill color={'success'} style={{ marginLeft: 6 }}>
@@ -234,7 +237,7 @@ export const Home = () => {
             <div style={{ marginBottom: 20 }}>
               <Row>
                 <Col md={6}>
-                  <UserDashboard ranking={ranking?.find((e: IRanking) => e.userId === account.id)} />
+                  <UserDashboard ranking={ranking?.find((e: IRanking) => e.userId === account.id)} account={account} />
                 </Col>
                 <Col md={6}>
                   <UsersRanking ranking={ranking?.filter((e: IRanking) => e.points > 0).sort((a, b) => b.points - a.points)} />
