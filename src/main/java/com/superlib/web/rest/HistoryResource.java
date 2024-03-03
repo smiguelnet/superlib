@@ -86,7 +86,7 @@ public class HistoryResource extends AbstractResource {
             throw new BadRequestAlertException("Livro não identificado no sistema", ENTITY_NAME, "idnotexists");
         }
 
-        Book book = byId.get();
+        Book book = byId.orElseThrow();
 
         User user = validateLoggedUser("setBookAsRead", "HistoryEvent");
         History result = null;
@@ -108,7 +108,7 @@ public class HistoryResource extends AbstractResource {
                 .body(result);
         } else {
             // in case the same book was evaluated twice or even more (unusual condition)
-            List<History> byUserAndBook = historyRepository.findByUserAndBook(user, byId.get());
+            List<History> byUserAndBook = historyRepository.findByUserAndBook(user, byId.orElseThrow());
             if (!CollectionUtils.isEmpty(byUserAndBook)) {
                 historyRepository.deleteAll(byUserAndBook);
             }
