@@ -38,7 +38,7 @@ export const RegisterPage = () => {
       <Row className="justify-content-center">
         <Col md="8">
           <h1 id="register-title" data-cy="registerTitle">
-            Registration
+            Criar nova conta de usuário
           </h1>
         </Col>
       </Row>
@@ -105,17 +105,11 @@ export const RegisterPage = () => {
             </Button>
           </ValidatedForm>
           <p>&nbsp;</p>
-          <Alert color="warning">
-            <span>If you want to </span>
+          <div>
             <Link to="/login" className="alert-link">
-              sign in
+              Já possuo uma conta
             </Link>
-            <span>
-              , you can try the default accounts:
-              <br />- Administrator (login=&quot;admin&quot; and password=&quot;admin&quot;) <br />- User (login=&quot;user&quot; and
-              password=&quot;user&quot;).
-            </span>
-          </Alert>
+          </div>
         </Col>
       </Row>
     </div>

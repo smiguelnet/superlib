@@ -228,8 +228,7 @@ export const Home = () => {
     <Row>
       <Col>
         <h1 className="display-4">Esse eu já li! {account?.id}</h1>
-
-        {!!account?.login ? (
+        {account && account?.login && (
           <>
             <p className="lead">Olá {account.login}, selecione os livros que já leu e ganhe pontos.</p>
             <div style={{ marginBottom: 20 }}>
@@ -246,26 +245,6 @@ export const Home = () => {
               <BooksList books={bookList} categories={categoryList} userHistory={userHistory} onReadBook={onReadBook} />
             </Card>
           </>
-        ) : (
-          <div>
-            <Alert color="warning">
-              If you want to
-              <span>&nbsp;</span>
-              <Link to="/login" className="alert-link">
-                sign in
-              </Link>
-              , you can try the default accounts:
-              <br />- Administrator (login=&quot;admin&quot; and password=&quot;admin&quot;) <br />- User (login=&quot;user&quot; and
-              password=&quot;user&quot;).
-            </Alert>
-
-            <Alert color="warning">
-              You don&apos;t have an account yet?&nbsp;
-              <Link to="/account/register" className="alert-link">
-                Register a new account
-              </Link>
-            </Alert>
-          </div>
         )}
       </Col>
     </Row>

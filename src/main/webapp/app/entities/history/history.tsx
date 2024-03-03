@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, getSortState } from 'react-jhipster';
+import { getSortState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
-import { ASC, DESC, SORT } from 'app/shared/util/pagination.constants';
+import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { ASC, DESC } from 'app/shared/util/pagination.constants';
 import { overrideSortStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
@@ -66,7 +66,7 @@ export const History = () => {
   return (
     <div>
       <h2 id="history-heading" data-cy="HistoryHeading">
-        Histories [{history?.length}]
+        Últimos [{history?.length}] eventos registratos no sistema
         <div className="d-flex justify-content-end">
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
@@ -93,8 +93,6 @@ export const History = () => {
                 <th className="hand" onClick={sort('registeredBy')}>
                   Registered By <FontAwesomeIcon icon={getSortIconByFieldName('registeredBy')} />
                 </th>
-
-                <th />
               </tr>
             </thead>
             <tbody>
@@ -107,31 +105,12 @@ export const History = () => {
                   <td>{history.points}</td>
                   <td>{history.createdDate}</td>
                   <td>{history.createdBy}</td>
-                  {/*<td>{history.book ? <Link to={`/book/${history.book.id}`}>{history.book.id}</Link> : ''}</td>*/}
-                  {/*<td className="text-end">*/}
-                  {/*  <div className="btn-group flex-btn-group-container">*/}
-                  {/*    <Button tag={Link} to={`/history/${history.id}`} color="info" size="sm" data-cy="entityDetailsButton">*/}
-                  {/*      <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>*/}
-                  {/*    </Button>*/}
-                  {/*    <Button tag={Link} to={`/history/${history.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">*/}
-                  {/*      <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>*/}
-                  {/*    </Button>*/}
-                  {/*    <Button*/}
-                  {/*      onClick={() => (window.location.href = `/history/${history.id}/delete`)}*/}
-                  {/*      color="danger"*/}
-                  {/*      size="sm"*/}
-                  {/*      data-cy="entityDeleteButton"*/}
-                  {/*    >*/}
-                  {/*      <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>*/}
-                  {/*    </Button>*/}
-                  {/*  </div>*/}
-                  {/*</td>*/}
                 </tr>
               ))}
             </tbody>
           </Table>
         ) : (
-          !loading && <div className="alert alert-warning">No Histories found</div>
+          !loading && <div className="alert alert-warning">Não existem eventos registrados no sistema</div>
         )}
       </div>
     </div>

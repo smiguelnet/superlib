@@ -6,11 +6,7 @@ import { Col, Row } from 'reactstrap';
 
 const Footer = () => (
   <div className="footer page-content">
-    <Row className={'bg-secondary p-5'}>
-      <Col md="12">
-        <p>Rodapé</p>
-      </Col>
-    </Row>
+    <div className={'mb-5'}>Esse eu já Li! - Versão 0.0.1 - Beta @2024</div>
   </div>
 );
 
