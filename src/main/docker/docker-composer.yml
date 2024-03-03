@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16.1
+    container_name: superlib_postgres
+    environment:
+      - POSTGRES_USER=superlib
+      - POSTGRES_PASSWORD=
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - '5432:5432'
+    networks:
+      - superlib_network
+
+  maildev:
+    image: djfarrelly/maildev
+    container_name: my_maildev
+    ports:
+      - '1080:80'
+      - '1025:25'
+    networks:
+      - superlib_network
+
+networks:
+  superlib_network:
+    driver: bridge
