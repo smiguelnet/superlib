@@ -10,7 +10,7 @@ import { getEntities as getBooks } from 'app/entities/book/book.reducer';
 import { getEntities as getCategories } from 'app/entities/category/category.reducer';
 import { getEntitiesByUser as getUserEvents, getUsersRanking, setBookAsRead } from 'app/entities/history/history.reducer';
 import { overrideSortStateWithQueryParams } from 'app/shared/util/entity-utils';
-import { getSortState, ValidatedField } from 'react-jhipster';
+import { getSortState } from 'react-jhipster';
 import { IBook } from 'app/shared/model/book.model';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ICategory } from 'app/shared/model/category.model';
@@ -33,8 +33,6 @@ type BooksListProps = {
 };
 
 const UserDashboard: React.FC<UserDashboardProps> = ({ ranking }) => {
-  // TODO: get this var from server configuration
-  const TOTAL_BOOKS_TO_ATTRIBUTE_TROPHY = 5;
   const pointsTotal = ranking?.points || 0;
 
   return (
@@ -54,7 +52,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ ranking }) => {
                 <Badge pill color={el.points > 0 ? 'warning' : 'secondary'} style={{ marginLeft: 6 }}>
                   Points: {el.points || 0}
                 </Badge>
-                {(el?.books || 0) >= TOTAL_BOOKS_TO_ATTRIBUTE_TROPHY && (
+                {!!el?.trophy && (
                   <Badge pill color={'success'} style={{ marginLeft: 6 }}>
                     <FontAwesomeIcon icon={'trophy'} />
                   </Badge>

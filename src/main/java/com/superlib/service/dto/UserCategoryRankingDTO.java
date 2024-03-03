@@ -8,6 +8,8 @@ public class UserCategoryRankingDTO {
     private Long points;
     private Integer books;
 
+    private boolean trophy;
+
     public Category getCategory() {
         return category;
     }
@@ -30,5 +32,13 @@ public class UserCategoryRankingDTO {
 
     public void setBooks(Integer books) {
         this.books = books;
+    }
+
+    public boolean isTrophy() {
+        return trophy;
+    }
+
+    public void setTrophy(boolean trophy) {
+        this.trophy = trophy;
     }
 }

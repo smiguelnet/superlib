@@ -16,6 +16,7 @@ public class GamificationService {
 
     private static final int POINTS_PER_BOOK = 1;
     private static final int PAGES_TO_UNLOCK_EXTRA_POINTS = 100;
+    private static final int BOOKS_TO_UNLOCK_TROPHY = 5;
 
     public static long calculatePoints(Book book) {
         if (book.getPages() == null) {
@@ -70,6 +71,7 @@ public class GamificationService {
                             existingCategory.ifPresent(e -> {
                                 e.setPoints(e.getPoints() + item.getPoints());
                                 e.setBooks(e.getBooks() + 1);
+                                e.setTrophy(e.getBooks() >= BOOKS_TO_UNLOCK_TROPHY);
                             });
                         } else {
                             // ADD

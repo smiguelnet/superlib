@@ -4,7 +4,12 @@ export interface IRanking {
   email?: string;
   points?: number;
   books?: number;
-  categories?: any[];
+  categories?: {
+    category?: any;
+    points?: number;
+    books?: number;
+    trophy?: boolean;
+  }[];
 }
 
 export const defaultValue: Readonly<IRanking> = {};
