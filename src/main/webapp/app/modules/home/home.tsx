@@ -1,9 +1,9 @@
 import './home.scss';
 
 import React, { Fragment, useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Alert, Badge, Button, Card, Col, ListGroup, ListGroupItem, Row, Table } from 'reactstrap';
+import { Badge, Button, Card, Col, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'reactstrap';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities as getBooks } from 'app/entities/book/book.reducer';
@@ -21,6 +21,7 @@ import { IUser } from 'app/shared/model/user.model';
 type UserDashboardProps = {
   ranking: IRanking;
   account: IUser;
+  openRanking: () => void;
 };
 
 type UserRankingProps = {
@@ -35,26 +36,38 @@ type BooksListProps = {
   onReadBook?: (book: IBook, read: boolean) => void;
 };
 
-const UserDashboard: React.FC<UserDashboardProps> = ({ ranking, account }) => {
+const UserDashboard: React.FC<UserDashboardProps> = ({ ranking, account, openRanking }) => {
   const pointsTotal = ranking?.points || 0;
 
   return (
     <div>
-      <h2 id="dashboard" data-cy="DashboardHeading">
-        Meu Dashboard
-        {/*{account.firstName}*/}
-      </h2>
-      {!!ranking?.categories && (
+      <Row>
+        <Col md={6}>
+          <h3 id="dashboard" data-cy="DashboardHeading">
+            Minha Pontuação
+          </h3>
+        </Col>
+        <Col md={6} style={{ alignContent: 'flex-end', textAlign: 'right' }}>
+          <Button color="secondary" style={{ marginLeft: 10, marginBottom: 8 }} onClick={() => openRanking()}>
+            Visualizar Ranking
+          </Button>
+        </Col>
+      </Row>
+      {!!ranking?.categories?.length ? (
         <ListGroup>
           <ListGroupItem active={true}>
-            Total de livros lidos: {ranking?.books}. Pontos: {pointsTotal}
+            Total de livros lidos: {ranking?.books} {'  '} {'  '}
+            <Badge pill color={pointsTotal > 0 ? 'info' : 'secondary'} style={{ marginLeft: 6, fontSize: 16 }}>
+              Pontuação: {pointsTotal}
+            </Badge>
           </ListGroupItem>
+
           {ranking.categories.map((el: any) => (
             <ListGroupItem key={el.userId}>
               <label style={{ paddingRight: 4 }}>
-                {el.category.title}. Total de livros: {el.books}
+                <span> {el.category.title}.</span> Livros: {el.books}
                 <Badge pill color={el.points > 0 ? 'warning' : 'secondary'} style={{ marginLeft: 6 }}>
-                  Pontos: {el.points || 0}
+                  Pontuação: {el.points || 0}
                 </Badge>
                 {!!el?.trophy && (
                   <Badge pill color={'success'} style={{ marginLeft: 6 }}>
@@ -65,6 +78,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ ranking, account }) => {
             </ListGroupItem>
           ))}
         </ListGroup>
+      ) : (
+        <ListGroup>
+          <ListGroupItem active={true}>Você ainda não marcou nenhum livro</ListGroupItem>
+        </ListGroup>
       )}
     </div>
   );
@@ -73,32 +90,42 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ ranking, account }) => {
 const UsersRanking: React.FC<UserRankingProps> = ({ ranking, account }) => {
   return (
     <div>
-      <h2 id="dashboard" data-cy="DashboardHeading">
-        Users Ranking
-      </h2>
       {!!ranking?.length && (
-        <ListGroup>
-          <ListGroupItem active={true}>{ranking?.length} maiores leitores de livros</ListGroupItem>
-          {ranking.map((el: any, index: number) => (
-            <ListGroupItem key={el.userId}>
-              <Badge color={'success'} style={{ marginRight: 6 }}>
-                {index + 1}
-              </Badge>
+        <Table striped>
+          <thead>
+            <tr>
+              <th style={{ textAlign: 'center' }}>Posição</th>
+              <th>Usuário</th>
+              <th>Pontuação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ranking?.slice(0, 10).map((el: any, index: number) => (
+              <tr key={el.userId}>
+                <td style={{ textAlign: 'center', width: 100 }}>
+                  <Badge color={'success'}>{index + 1}</Badge>
+                </td>
+                <td>
+                  {el.userName}
+                  <div>
+                    <small className={'text-success'}>{el.email}</small>
+                  </div>
+                </td>
+                <td>
+                  <Badge pill color={el.points > 0 ? 'info' : 'secondary'} style={{ fontSize: 14 }}>
+                    {el.points || 0}
+                  </Badge>
 
-              <label style={{ paddingRight: 4 }}>
-                {el.userName}
-                <Badge pill color={el.points > 0 ? 'info' : 'secondary'} style={{ marginLeft: 6 }}>
-                  Points: {el.points || 0}
-                </Badge>
-              </label>
-              {account && account.id === el.userId && (
-                <Badge color={'success'} style={{ marginLeft: 6 }}>
-                  {`${index === 0 ? 'Parabéns' : 'Legal! Você faz parte do ranking'}`}
-                </Badge>
-              )}
-            </ListGroupItem>
-          ))}
-        </ListGroup>
+                  {account && account.id === el.userId && (
+                    <Badge color={'success'} style={{ marginLeft: 6 }}>
+                      {`${index === 0 ? 'Parabéns' : 'Legal! Você faz parte do ranking'}`}
+                    </Badge>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
     </div>
   );
@@ -111,7 +138,7 @@ const BooksList: React.FC<BooksListProps> = ({ books, categories, userHistory, o
       <Row>
         <Col className={'col-6'}>
           <h2 id="book-heading" data-cy="BookHeading">
-            Existem {books.length} Livros Disponíveis
+            Existem <strong>{books.length}</strong> Livros Disponíveis
           </h2>
         </Col>
         {/*<Col className={'col-6'}>*/}
@@ -137,8 +164,8 @@ const BooksList: React.FC<BooksListProps> = ({ books, categories, userHistory, o
       </Row>
       <hr />
       <Row>
-        <Col>
-          <Table responsive>
+        <Col className={'custom-table-responsive'}>
+          <Table responsive striped>
             <thead>
               <tr>
                 <th>Livro</th>
@@ -206,6 +233,13 @@ export const Home = () => {
 
   const [sortState, setSortState] = useState(overrideSortStateWithQueryParams(getSortState(pageLocation, 'id'), pageLocation.search));
 
+  const [modal, setModal] = useState(false);
+
+  const closeModal = e => {
+    e.preventDefault();
+    setModal(false);
+  };
+
   const onReadBook = (book: IBook, status: boolean = true) => {
     console.log('add event...', book);
     const entity = { bookId: book.id, read: status, userId: account.id };
@@ -239,32 +273,50 @@ export const Home = () => {
   };
 
   return (
-    <Row>
-      <Col>
-        <h1 className="display-4">Esse eu já li!</h1>
-        {account && account?.login && (
-          <>
-            <p className="lead">Olá {account.login}, selecione os livros que já leu e ganhe pontos.</p>
-            <div style={{ marginBottom: 20 }}>
-              <Row>
-                <Col md={6}>
-                  <UserDashboard ranking={ranking?.find((e: IRanking) => e.userId === account.id)} account={account} />
-                </Col>
-                <Col md={6}>
-                  <UsersRanking
-                    ranking={ranking?.filter((e: IRanking) => e.points > 0).sort((a, b) => b.points - a.points)}
-                    account={account}
-                  />
-                </Col>
-              </Row>
-            </div>
-            <Card>
-              <BooksList books={bookList} categories={categoryList} userHistory={userHistory} onReadBook={onReadBook} />
-            </Card>
-          </>
-        )}
-      </Col>
-    </Row>
+    <>
+      {account && account?.login && (
+        <Row>
+          <Col md={6}>
+            <h1 className="display-4">Esse eu já li!</h1>
+            <p className="lead">
+              Olá <strong>{account.login}</strong>, selecione os livros que já leu e ganhe pontos.
+            </p>
+          </Col>
+          <Col md={6}>
+            <UserDashboard
+              ranking={ranking?.find((e: IRanking) => e.userId === account.id)}
+              account={account}
+              openRanking={() => setModal(true)}
+            />
+          </Col>
+        </Row>
+      )}
+
+      <Row className={'pt-4'}>
+        <Col>
+          <Card>
+            <BooksList books={bookList} categories={categoryList} userHistory={userHistory} onReadBook={onReadBook} />
+          </Card>
+        </Col>
+      </Row>
+
+      <Modal isOpen={modal} toggle={closeModal} size={'lg'}>
+        <ModalHeader toggle={closeModal}>Ranking</ModalHeader>
+        <ModalBody>
+          <UsersRanking ranking={ranking?.filter((e: IRanking) => e.points > 0).sort((a, b) => b.points - a.points)} account={account} />
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="secondary"
+            onClick={() => {
+              setModal(false);
+            }}
+          >
+            fechar
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </>
   );
 };
 

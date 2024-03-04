@@ -8,6 +8,8 @@ services:
       - POSTGRES_USER=superlib
       - POSTGRES_PASSWORD=
       - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - /Users/sergiomiguel/TEMP/postgres/:/var/lib/postgresql/data/
     ports:
       - '5432:5432'
     networks:
