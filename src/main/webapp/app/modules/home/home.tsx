@@ -164,7 +164,7 @@ const BooksList: React.FC<BooksListProps> = ({ books, categories, userHistory, o
       </Row>
       <hr />
       <Row>
-        <Col className={'custom-table-responsive'}>
+        <Col>
           <Table responsive striped>
             <thead>
               <tr>
